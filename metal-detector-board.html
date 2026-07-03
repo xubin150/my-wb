@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品详情技术文档 - 谷波微电子</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        /* 额外加入微调样式，提升细节质感 */
+        :root {
+            --primary: #0072bc; /* 科技蓝主色调 */
+        }
+        body {
+            background-color: #f8f9fa;
+        }
+        main.container {
+            max-width: 1000px; /* 优化阅读宽度 */
+            padding: 40px 20px;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .hero-section h1 { color: #ffffff; margin-bottom: 10px; }
+        .hero-section p { color: #cbd5e1; }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 8px;
+            background-color: #0ea5e9;
+            color: white;
+        }
+        .badge.hardware { background-color: #10b981; }
+        .badge.firmware { background-color: #8b5cf6; }
+        
+        .feature-card {
+            border-top: 4px solid var(--primary);
+            transition: transform 0.2s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        table th { background-color: #f1f5f9; }
+        table td, table th { vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+    <nav class="container">
+        <ul>
+            <li><strong>谷波微电子工作室</strong></li>
+        </ul>
+        <ul>
+            <li><a href="index.html" class="secondary">返回产品目录</a></li>
+            <li><a href="#specifications">技术参数</a></li>
+            <li><a href="#documentation">说明文档</a></li>
+            <li><a href="mailto:sales@ydetector.cn" role="button" class="outline contrast">获取样片</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+
+        <header class="hero-section">
+            <div class="grid" style="align-items: center;">
+                <div>
+                    <div>
+                        <span class="badge hardware">硬件 Rev.B</span>
+                        <span class="badge firmware">固件 v1.0.4</span>
+                    </div>
+                    <h1 style="margin-top: 15px;">维护中</h1>
+                    <p>专为高精度微弱信号抓取设计的底层硬件平台，集成实时信号调理、全数字化滤波算法与智能电源管理系统。</p>
+                    <div style="margin-top: 30px;">
+                        <a href="https://pan.baidu.com/s/16FS_hzhjequu98rl-DUnxw?pwd=0000" target="_blank" role="button" class="contrast">下载数据资料 (PDF)</a>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <img src="https://via.placeholder.com/400x300/334155/fff?text=PRODUCT+IMAGE" alt="产品外观" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);">
+                </div>
+            </div>
+        </header>
+
+        <section id="features" style="margin-bottom: 50px;">
+            <div class="grid">
+                <article class="feature-card">
+                    <h5>⚡ </h5>
+                    <p style="font-size: 0.9rem; color: #64748b;">深度优化的高精度 ADC 采样通道，配合微控制器底层全数字滤波算法，大幅抑制环境电磁噪声。</p>
+                </article>
+                <article class="feature-card">
+                    <h5>🔋 </h5>
+                    <p style="font-size: 0.9rem; color: #64748b;"></p>
+                </article>
+                <article class="feature-card">
+                    <h5>🎨 </h5>
+                    <p style="font-size: 0.9rem; color: #64748b;"></p>
+                </article>
+            </div>
+        </section>
+
+        <section id="specifications" style="margin-bottom: 50px;">
+            <h2>技术规格参数</h2>
+            <figure> <table class="striped">
+                    <thead>
+                        <tr>
+                            <th width="20%">分类</th>
+                            <th width="30%">参数项</th>
+                            <th width="50%">规格/指标</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row" rowspan="3">核心运算</th>
+                            <td>主控架构</td>
+                            <td>STM32 高性能微控制器 (基于 C 语言与 HAL 库深度优化)</td>
+                        </tr>
+                        <tr>
+                            <td>系统内核</td>
+                            <td>裸机高频轮询架构 (无 RTOS 开销，确保绝对实时性)</td>
+                        </tr>
+                        <tr>
+                            <td>接口协议</td>
+                            <td>标准 I2C / SPI 高速通信接口</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" rowspan="3">信号与交互</th>
+                            <td>采样分辨率</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>音频反馈</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>显示支持</td>
+                            <td> </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" rowspan="3">电源与环境</th>
+                            <td>输入电压</td>
+                            <td>3S</td>
+                        </tr>
+                        <tr>
+                            <td>低电监测</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>工作温度</td>
+                            <td>-20°C 至 85°C</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </figure>
+        </section>
+
+        <section id="documentation" style="margin-bottom: 50px;">
+            <h2>详细说明文档</h2>
+            
+            <details open>
+                <summary>💡 快速入门引导与接口说明</summary>
+                <p>在接入系统前，请严格参照硬件丝印引脚进行接线：</p>
+                <ul>
+                    <li><strong>电源输入：</strong> 请接入标准 3S 锂电池组，确认正负极未反接。</li>
+                    <li><strong>屏幕接口：</strong> 无</li>
+                    <li><strong>音频输出：</strong>输出端可直接外接小功率扬声器，用于实时音频物理反馈。</li>
+                </ul>
+            </details>
+
+            <details>
+                <summary>🧠 底层架构与原理解析</summary>
+                <p>本模块核心代码经过高度优化。主循环内部采用无阻塞计时器替代传统的延时函数，确保在处理大数据量信号过滤的同时，依然能对物理按键、屏幕 UI 刷新做出微秒级的实时响应。</p>
+                <p>电源管理算法采用多点滑动平均滤波，有效过滤了因大功率元件工作时引起的电源线路瞬态毛刺，从而保证了锂电池剩余电量百分比指示的稳定性。</p>
+            </details>
+
+            <details>
+                <summary>⚠️ 安全注意事项与工程维护</summary>
+                <ol>
+                    <li>禁止在超出 12.6V的电压环境下长期运行，以免造成芯片外围分压电阻烧毁或 ADC 通道永久性损坏。</li>
+                    <li>在具有高强度静电或潮湿环境的工业现场部署时，请务必增加全金属屏蔽外壳并做好接地处理。</li>
+                </ol>
+            </details>
+        </section>
+
+        <footer>
+            <hr>
+            <div class="grid" style="font-size: 0.9rem; color: #64748b;">
+                <div>
+                    <p><strong>© 谷波微电子工作室</strong></p>
+                     <p>邮箱:www.xubin15@qq.com</p>
+                </div>
+                <div style="text-align: right;">
+                  <p>
+                    <a href="https://eu24vg6ewe7brkkzbdzpoxiegwhdp2y.taobao.com/index.htm?spm=a1z10.5-c.w5002-17854857935.2.6d03147fACBMSy" target="_blank" style="color: #0072bc; text-decoration: none; font-weight: bold;">淘宝店铺</a>
+                  </p>
+                  <p>技术支持时间：工作日 09:00 - 18:00</p>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+</body>
+</html>
