@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>空心线圈电感量估算工具 - 谷波微电子</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        html { scroll-behavior: smooth; }
+        body { background-color: #f8fafc; }
+        
+        nav { padding: 10px 0; }
+        nav strong { color: #1e293b; font-size: 1.2rem; }
+
+        .tool-header {
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+            color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        .tool-header h1 { color: #ffffff; font-size: 2rem; margin-bottom: 10px; }
+        .tool-header p { color: #cbd5e1; font-size: 1rem; margin-bottom: 0; }
+
+        .calculator-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 选项卡样式 */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: #1e293b; }
+        .tab-btn.active {
+            color: #0f172a;
+            border-bottom: 3px solid #475569;
+            margin-bottom: -12px; 
+        }
+
+        /* 表单与结果区 */
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        
+        .result-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid #475569;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 20px;
+        }
+        .result-val {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0f172a;
+            margin: 10px 0;
+        }
+        .note {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 15px;
+        }
+
+        /* 反推表格特定样式 */
+        .highlight-row {
+            background-color: #e2e8f0 !important;
+            font-weight: bold;
+            color: #0f172a;
+            border-left: 4px solid #10b981;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        
+        <nav aria-label="breadcrumb">
+            <ul>
+                <li><a href="index.html">返回研发日志</a></li>
+                <li>在线工具</li>
+            </ul>
+        </nav>
+
+        <header class="tool-header">
+            <h1>空心线圈计算器</h1>
+            <p>基于 H.A. Wheeler 多层密绕线圈经验公式开发。支持正向电感估算与反向匝数推算，默认材料为漆包线，为底层硬件测试提供参考数据。</p>
+        </header>
+
+        <article class="calculator-card">
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('circular')">圆形电感计算</button>
+                <button class="tab-btn" onclick="switchTab('rectangular')">矩形电感计算</button>
+                <button class="tab-btn" onclick="switchTab('reverse')">🎯 目标电感反推匝数</button>
+            </div>
+
+            <div id="circular" class="form-section active">
+                <div class="grid">
+                    <label>线圈平均直径 (mm)
+                        <input type="number" id="circ-dia" value="200" step="1">
+                    </label>
+                    <label>绕制圈数 (N)
+                        <input type="number" id="circ-turns" value="50" step="1">
+                    </label>
+                    <label>漆包线铜芯直径 (mm)
+                        <input type="number" id="circ-wire" value="0.5" step="0.1">
+                    </label>
+                </div>
+                <button onclick="calcCircular()" style="background-color: #475569; border: none; margin-top: 10px;">计算电感量</button>
+                
+                <div class="result-box">
+                    <div>理论估算电感量 (L)：</div>
+                    <div class="result-val" id="result-display-circ">0.00 µH</div>
+                </div>
+            </div>
+
+            <div id="rectangular" class="form-section">
+                <div class="grid">
+                    <label>线圈长度 (mm)
+                        <input type="number" id="rect-len" value="250" step="1">
+                    </label>
+                    <label>线圈宽度 (mm)
+                        <input type="number" id="rect-width" value="150" step="1">
+                    </label>
+                </div>
+                <div class="grid">
+                    <label>绕制圈数 (N)
+                        <input type="number" id="rect-turns" value="50" step="1">
+                    </label>
+                    <label>漆包线铜芯直径 (mm)
+                        <input type="number" id="rect-wire" value="0.5" step="0.1">
+                    </label>
+                </div>
+                <button onclick="calcRectangular()" style="background-color: #475569; border: none; margin-top: 10px;">计算电感量</button>
+                
+                <div class="result-box">
+                    <div>理论估算电感量 (L)：</div>
+                    <div class="result-val" id="result-display-rect">0.00 µH</div>
+                </div>
+            </div>
+
+            <div id="reverse" class="form-section">
+                <div class="grid">
+                    <label>目标电感量 (µH)
+                        <input type="number" id="rev-target-l" value="1000" step="10">
+                    </label>
+                    <label>线圈形状
+                        <select id="rev-shape" onchange="toggleReverseShape()">
+                            <option value="circular">圆形线圈</option>
+                            <option value="rectangular">矩形线圈</option>
+                        </select>
+                    </label>
+                    <label>漆包线直径 (mm)
+                        <input type="number" id="rev-wire" value="0.5" step="0.1">
+                    </label>
+                </div>
+
+                <div id="rev-size-inputs" class="grid">
+                    <label>线圈平均直径 (mm)
+                        <input type="number" id="rev-circ-dia" value="200" step="1">
+                    </label>
+                </div>
+
+                <button onclick="calcReverse()" style="background-color: #10b981; border: none; margin-top: 10px;">推算参考匝数</button>
+
+                <div id="rev-result-area" style="display: none; margin-top: 20px;">
+                    <p style="color: #475569; font-weight: bold;">为您找到最接近的匝数方案（最佳匹配已高亮）：</p>
+                    <table class="striped">
+                        <thead>
+                            <tr>
+                                <th>匝数 (N)</th>
+                                <th>估算电感量 (µH)</th>
+                                <th>与目标偏差</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rev-tbody">
+                            </tbody>
+                    </table>
+                    <p class="note" style="color: #f59e0b;">* 建议在实操时按表中最高匝数绕制，并使用 LCR 电桥一边测试一边退线，以达到极高精度。</p>
+                </div>
+            </div>
+
+            <p class="note" style="margin-top: 30px;">
+                * 估算模型采用 Wheeler 多层密绕经验公式。线包截面填充率（占空比）默认按手工绕制设定为 0.65，漆皮厚度估算系数为 1.1。
+            </p>
+
+        </article>
+    </main>
+
+    <script>
+        // 选项卡切换逻辑
+        function switchTab(tabId) {
+            document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 反推面板：根据形状切换尺寸输入框
+        function toggleReverseShape() {
+            const shape = document.getElementById('rev-shape').value;
+            const container = document.getElementById('rev-size-inputs');
+            if (shape === 'circular') {
+                container.innerHTML = `
+                    <label>线圈平均直径 (mm)
+                        <input type="number" id="rev-circ-dia" value="200" step="1">
+                    </label>
+                `;
+            } else {
+                container.innerHTML = `
+                    <label>线圈长度 (mm)
+                        <input type="number" id="rev-rect-len" value="250" step="1">
+                    </label>
+                    <label>线圈宽度 (mm)
+                        <input type="number" id="rev-rect-width" value="150" step="1">
+                    </label>
+                `;
+            }
+        }
+
+        // 核心算法：计算指定匝数和参数下的电感量 (返回 µH)
+        function getInductance(N, shape, size1, size2, wireCu) {
+            const d_wire_actual = wireCu * 1.1;
+            const area_wire = Math.PI * Math.pow(d_wire_actual / 2, 2);
+            const area_bundle = (N * area_wire) / 0.65;
+            const w = Math.sqrt(area_bundle);
+            const c = w;
+
+            if (shape === 'circular') {
+                const r = size1 / 2;
+                return (0.0315 * Math.pow(r, 2) * Math.pow(N, 2)) / (6 * r + 9 * w + 10 * c);
+            } else {
+                const a = (size1 + size2) / 2; // 矩形等效边长
+                return (0.0315 * Math.pow(a, 2) * Math.pow(N, 2)) / (6 * a + 9 * w + 10 * c);
+            }
+        }
+
+        // 1. 正向：计算圆形
+        function calcCircular() {
+            const D = parseFloat(document.getElementById('circ-dia').value);
+            const N = parseFloat(document.getElementById('circ-turns').value);
+            const wire = parseFloat(document.getElementById('circ-wire').value);
+            if (D <= 0 || N <= 0 || wire <= 0) return alert("参数无效");
+            
+            const L_uH = getInductance(N, 'circular', D, null, wire);
+            document.getElementById('result-display-circ').innerText = L_uH.toFixed(2) + " µH";
+        }
+
+        // 2. 正向：计算矩形
+        function calcRectangular() {
+            const len = parseFloat(document.getElementById('rect-len').value);
+            const wid = parseFloat(document.getElementById('rect-width').value);
+            const N = parseFloat(document.getElementById('rect-turns').value);
+            const wire = parseFloat(document.getElementById('rect-wire').value);
+            if (len <= 0 || wid <= 0 || N <= 0 || wire <= 0) return alert("参数无效");
+
+            const L_uH = getInductance(N, 'rectangular', len, wid, wire);
+            document.getElementById('result-display-rect').innerText = L_uH.toFixed(2) + " µH";
+        }
+
+        // 3. 反向：推算匝数
+        function calcReverse() {
+            const targetL = parseFloat(document.getElementById('rev-target-l').value);
+            const shape = document.getElementById('rev-shape').value;
+            const wireCu = parseFloat(document.getElementById('rev-wire').value);
+
+            let size1, size2;
+            if (shape === 'circular') {
+                size1 = parseFloat(document.getElementById('rev-circ-dia').value);
+                if (size1 <= 0) return alert("参数无效");
+            } else {
+                size1 = parseFloat(document.getElementById('rev-rect-len').value);
+                size2 = parseFloat(document.getElementById('rev-rect-width').value);
+                if (size1 <= 0 || size2 <= 0) return alert("参数无效");
+            }
+
+            if (targetL <= 0 || wireCu <= 0) return alert("参数无效");
+
+            // 暴力枚举：从 1 圈开始计算，找到刚好超越目标电感量的圈数
+            let bestN = 1;
+            let minDiff = Infinity;
+            let currentL = 0;
+
+            for (let N = 1; N <= 2000; N++) { // 2000圈为硬拦截上线
+                currentL = getInductance(N, shape, size1, size2, wireCu);
+                let diff = Math.abs(currentL - targetL);
+                
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    bestN = N;
+                }
+                
+                // 已经大幅超越目标值，停止穷举
+                if (currentL > targetL * 1.5 && N > 5) break; 
+            }
+
+            // 渲染表格：展示最佳匝数前后各 3 圈的数据，共 7 行数据
+            const tbody = document.getElementById('rev-tbody');
+            tbody.innerHTML = '';
+            
+            let startN = Math.max(1, bestN - 3); // 防止出现负数圈
+            let endN = bestN + 3;
+
+            for (let N = startN; N <= endN; N++) {
+                let L = getInductance(N, shape, size1, size2, wireCu);
+                let rawDiff = L - targetL;
+                
+                // 格式化误差显示：带符号，超出的显示绿色，不足显示红色
+                let diffStr = rawDiff > 0 ? `+${rawDiff.toFixed(2)}` : rawDiff.toFixed(2);
+                let diffColor = rawDiff > 0 ? '#10b981' : '#f43f5e';
+                
+                let isBestClass = (N === bestN) ? 'class="highlight-row"' : '';
+
+                let tr = `<tr ${isBestClass}>
+                    <td>${N}</td>
+                    <td>${L.toFixed(2)}</td>
+                    <td style="color: ${diffColor};">${diffStr} µH</td>
+                </tr>`;
+                tbody.innerHTML += tr;
+            }
+
+            // 显示表格区
+            document.getElementById('rev-result-area').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
